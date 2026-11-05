@@ -72,8 +72,9 @@ app.get("/agora", (req, res) => {
   res.send(page("Agora", `<p>Este pedido foi respondido às <b>${now}</b>.</p>`));
 });
 
-// NOVO · Tarefa 1: a API devolve as cartas em JSON
 app.get("/api/cartas", (req, res) => {
+  // NOVO · Tarefa 3: autoriza a app React (Vite) a ler esta resposta
+  res.set("Access-Control-Allow-Origin", "http://localhost:5173");
   res.json(cards);
 });
 
