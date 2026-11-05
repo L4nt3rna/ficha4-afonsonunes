@@ -73,12 +73,13 @@ app.get("/agora", (req, res) => {
 });
 
 app.get("/api/cartas", (req, res) => {
-  // NOVO · Tarefa 3: autoriza a app React (Vite) a ler esta resposta
   res.set("Access-Control-Allow-Origin", "http://localhost:5173");
   res.json(cards);
 });
 
 app.use((req, res) => {
+  // NOVO · Tarefa 5: o 404 também precisa do header do CORS
+  res.set("Access-Control-Allow-Origin", "http://localhost:5173");
   res.status(404).send(page(
     "404 — não encontrado",
     `<p>Não existe nada em <code>${req.url}</code>.</p>
