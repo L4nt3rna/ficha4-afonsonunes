@@ -3,6 +3,7 @@ import Card from "./Card.jsx";
 
 function App() {
   const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true); // NOVO
   const [filter, setFilter] = useState("Todas");
   const [search, setSearch] = useState("");
   const [randomCard, setRandomCard] = useState(null);
@@ -11,7 +12,8 @@ function App() {
   useEffect(() => {
     fetch("http://localhost:3000/api/cartas")
       .then((res) => res.json())
-      .then((data) => setCards(data));
+      .then((data) => setCards(data))
+      .finally(() => setLoading(false)); // NOVO
   }, []);
 
   let visible = cards
@@ -49,7 +51,10 @@ function App() {
         placeholder="Procurar pelo nome…"
       />
 
-      {visible.length === 0 ? (
+      {/* NOVO: enquanto as cartas não chegam, mostra "A carregar…" */}
+      {loading ? (
+        <p>A carregar…</p>
+      ) : visible.length === 0 ? (
         <p>Nenhuma carta corresponde.</p>
       ) : (
         <ul>
