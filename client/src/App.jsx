@@ -3,7 +3,8 @@ import Card from "./Card.jsx";
 
 function App() {
   const [cards, setCards] = useState([]);
-  const [loading, setLoading] = useState(true); // NOVO
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // NOVO
   const [filter, setFilter] = useState("Todas");
   const [search, setSearch] = useState("");
   const [randomCard, setRandomCard] = useState(null);
@@ -11,9 +12,14 @@ function App() {
 
   useEffect(() => {
     fetch("http://localhost:3000/api/cartas")
-      .then((res) => res.json())
+      .then((res) => {
+        // NOVO: um 404 ou 500 não faz o fetch falhar, por isso verificamos nós
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then((data) => setCards(data))
-      .finally(() => setLoading(false)); // NOVO
+      .catch((err) => setError(err.message)) // NOVO
+      .finally(() => setLoading(false));
   }, []);
 
   let visible = cards
@@ -32,9 +38,12 @@ function App() {
     <main>
       <h1>A minha coleção</h1>
 
-      <p>
-        Tenho {cards.length} cartas · a mostrar {visible.length}
-      </p>
+      {/* NOVO: com erro, não mostramos "Tenho 0 cartas" */}
+      {!error && (
+        <p>
+          Tenho {cards.length} cartas · a mostrar {visible.length}
+        </p>
+      )}
 
       <div>
         <button onClick={() => setFilter("Todas")}>Todas</button>
@@ -51,9 +60,10 @@ function App() {
         placeholder="Procurar pelo nome…"
       />
 
-      {/* NOVO: enquanto as cartas não chegam, mostra "A carregar…" */}
       {loading ? (
         <p>A carregar…</p>
+      ) : error ? (
+        <p>Não foi possível carregar as cartas: {error}</p> // NOVO
       ) : visible.length === 0 ? (
         <p>Nenhuma carta corresponde.</p>
       ) : (
